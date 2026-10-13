@@ -3,7 +3,7 @@
 A small macOS clipboard manager that lives in the menu bar.
 
 - Keeps your **last 20 copies** (text and images). Anything you copy with ⌘C (or Edit › Copy) is added.
-- **⌃⇧V** (Ctrl+Shift+V) opens the history next to your mouse.
+- **⌘⇧V** (Cmd+Shift+V) opens the history next to your mouse.
   - Hover a row to see a full preview beside the list.
   - Click a row, press **↩**, or press **1–9** to paste it into the app you were using.
   - **↑/↓** to move, **esc** to close.
@@ -47,7 +47,7 @@ Source is in `Sources/CopyHero/`:
 | File | Purpose |
 |---|---|
 | `ClipboardHistory.swift` | In-memory history + pasteboard polling |
-| `HistoryPanel.swift` | The ⌃⇧V popup and the hover preview |
+| `HistoryPanel.swift` | The ⌘⇧V popup and the hover preview |
 | `HotKey.swift` | Global hotkey (Carbon) |
 | `Paster.swift` | Writes to the clipboard and sends ⌘V |
 | `AppDelegate.swift` | Menu bar item, login item |

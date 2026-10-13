@@ -14,7 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         monitor.start()
 
         panel = HistoryPanelController(history: history)
-        hotKey = HotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(controlKey | shiftKey)) { [weak self] in
+        hotKey = HotKey(keyCode: UInt32(kVK_ANSI_V), modifiers: UInt32(cmdKey | shiftKey)) { [weak self] in
             self?.panel.toggle()
         }
 
@@ -47,7 +47,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.removeAllItems()
 
         let show = NSMenuItem(title: "Show History", action: #selector(showHistory), keyEquivalent: "v")
-        show.keyEquivalentModifierMask = [.control, .shift]
+        show.keyEquivalentModifierMask = [.command, .shift]
         menu.addItem(show)
         menu.addItem(NSMenuItem(title: "Clear History (\(history.items.count))", action: #selector(clearHistory), keyEquivalent: ""))
         menu.addItem(.separator())
