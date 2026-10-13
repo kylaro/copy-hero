@@ -113,6 +113,7 @@ final class HistoryPanelController: NSObject, NSWindowDelegate {
     private let preview = PreviewPanelController()
     private var rows: [RowView] = []
     private var selected: Int?
+    private var targetApp: NSRunningApplication?
 
     private let width: CGFloat = 340
     private let rowHeight: CGFloat = 24
@@ -136,6 +137,10 @@ final class HistoryPanelController: NSObject, NSWindowDelegate {
         let mouse = NSEvent.mouseLocation
         let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main
         let visible = screen?.visibleFrame ?? .zero
+
+        // Remember who should receive the paste; a mouse click can shift focus.
+        let front = NSWorkspace.shared.frontmostApplication
+        targetApp = front?.processIdentifier == ProcessInfo.processInfo.processIdentifier ? nil : front
 
         rebuild()
         var origin = NSPoint(x: mouse.x + 4, y: mouse.y - panel.frame.height - 4)
@@ -237,12 +242,10 @@ final class HistoryPanelController: NSObject, NSWindowDelegate {
     private func choose(_ index: Int) {
         guard index < history.items.count else { return }
         let item = history.items[index]
+        let target = targetApp
         hide()
         Paster.copyToPasteboard(item)
-        // Give the window server a moment to return focus before sending ⌘V.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-            Paster.pasteIntoFrontApp()
-        }
+        Paster.paste(into: target)
     }
 
     @objc private func clearHistory() {

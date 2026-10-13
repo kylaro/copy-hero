@@ -26,17 +26,43 @@ enum Paster {
         }
     }
 
-    /// Sends ⌘V to whatever app is frontmost. Needs Accessibility permission;
-    /// without it the item is still on the clipboard for a manual ⌘V.
-    static func pasteIntoFrontApp() {
-        guard hasAccessibility else { return }
+    /// Brings `target` back to the front, then sends ⌘V to it. Needs Accessibility
+    /// permission; without it the item is still on the clipboard for a manual ⌘V.
+    static func paste(into target: NSRunningApplication?) {
+        guard hasAccessibility else {
+            NSLog("CopyHero: Accessibility not granted, skipping auto-paste")
+            return
+        }
+        if let target, !target.isActive {
+            target.activate()
+        }
+        waitForFocus(of: target, attemptsLeft: 20) { sendCommandV() }
+    }
+
+    /// Polls until `target` is frontmost (or we give up), then a short settle delay so
+    /// its key window is ready to receive the keystroke.
+    private static func waitForFocus(of target: NSRunningApplication?, attemptsLeft: Int, then action: @escaping () -> Void) {
+        let ready = target == nil || NSWorkspace.shared.frontmostApplication == target
+        if ready || attemptsLeft == 0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: action)
+            return
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.02) {
+            waitForFocus(of: target, attemptsLeft: attemptsLeft - 1, then: action)
+        }
+    }
+
+    private static func sendCommandV() {
         let src = CGEventSource(stateID: .combinedSessionState)
+        // Don't let the just-finished mouse click suppress our synthetic keystroke.
+        src?.setLocalEventsFilterDuringSuppressionState([.permitLocalMouseEvents, .permitSystemDefinedEvents],
+                                                        state: .eventSuppressionStateSuppressionInterval)
         let vKey = CGKeyCode(kVK_ANSI_V)
         let down = CGEvent(keyboardEventSource: src, virtualKey: vKey, keyDown: true)
         let up = CGEvent(keyboardEventSource: src, virtualKey: vKey, keyDown: false)
         down?.flags = .maskCommand
         up?.flags = .maskCommand
-        down?.post(tap: .cghidEventTap)
-        up?.post(tap: .cghidEventTap)
+        down?.post(tap: .cgSessionEventTap)
+        up?.post(tap: .cgSessionEventTap)
     }
 }

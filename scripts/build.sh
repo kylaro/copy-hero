@@ -28,5 +28,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-codesign --force --sign - "$APP"
+# Pin the designated requirement to the bundle ID so the Accessibility grant
+# survives rebuilds (plain ad-hoc signing ties it to this build's hash).
+codesign --force --sign - -r='designated => identifier "com.kylar.copyhero"' "$APP"
 echo "Built $APP"

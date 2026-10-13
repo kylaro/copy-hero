@@ -27,8 +27,9 @@ To type ⌘V into the app for you, CopyHero needs **Accessibility** access
 (System Settings › Privacy & Security › Accessibility). macOS asks on first launch.
 Without it, picking an item still puts it on your clipboard; just press ⌘V yourself.
 
-The app is ad-hoc signed, so after a **rebuild** macOS may treat it as a new app. If auto-paste
-stops working, remove CopyHero from the Accessibility list and add it again.
+The app is ad-hoc signed with a requirement pinned to its bundle ID, so the grant normally
+survives rebuilds. If auto-paste stops working (e.g. after upgrading from an older build),
+remove CopyHero from the Accessibility list and add it again.
 
 ## Uninstall
 
